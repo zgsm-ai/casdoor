@@ -566,12 +566,14 @@
     "username, Email or phone": "用户名、Email或手机号",
     "Other login methods": "其它登录方式",
     "Welcome to Shenma": "欢迎来到神码天地🎉🎉",
-    "Login by acceptance": "登陆即代表同意",
+    "Login by acceptance": "登录即代表同意",
     "Terms of Service": "《诸葛神码用户协议》",
     "Privacy Policy": "《隐私政策》",
-    "Login success": "您已成功登陆诸葛神码，请返回IDE客户端立即体验",
-    "Log in with GitHub": "通过 Github 登陆",
-    "Log in to Zhuge Shenma": "登录诸葛神码"
+    "Login success": "您已成功登录诸葛神码，请返回IDE客户端立即体验",
+    "Log in with type": "通过 {type} 登录",
+    "Log in to Zhuge Shenma": "登录诸葛神码",
+    "bind with type": "通过 {type} 绑定",
+    "bind with Phone": "通过手机号绑定"
   },
   "mfa": {
     "Each time you sign in to your Account, you'll need your password and a authentication code": "每次登录帐户时，都需要密码和认证码",
