@@ -147,7 +147,7 @@ export function goToWeb3Url(application, provider, method) {
   }
 }
 
-export function renderProviderLogo(provider, application, width, margin, size, location) {
+export function renderProviderLogo(provider, application, width, margin, size, location, bindType) {
   if (size === "small") {
     if (provider.category === "OAuth") {
       if (provider.type === "WeChat" && provider.clientId2 !== "" && provider.clientSecret2 !== "" && provider.disableSsl === true && !navigator.userAgent.includes("MicroMessenger")) {
@@ -180,7 +180,9 @@ export function renderProviderLogo(provider, application, width, margin, size, l
               fontSize: "16px",
               fontWeight: 600,
             }}>
-              {i18next.t("login:Log in with GitHub")}
+              {bindType
+                ? i18next.t("login:bind with type").replace("{type}", provider.name)
+                : i18next.t("login:Log in with type").replace("{type}", provider.name)}
             </span>
           </div>
         );

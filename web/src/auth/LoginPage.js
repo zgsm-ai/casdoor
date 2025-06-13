@@ -67,6 +67,8 @@ class LoginPage extends React.Component {
       loginLoading: false,
       userCode: props.userCode ?? (props.match?.params?.userCode ?? null),
       userCodeStatus: "",
+      // bind type phone or github
+      bindType: "",
     };
 
     if (this.state.type === "cas" && props.match?.params.casApplicationName !== undefined) {
@@ -89,6 +91,11 @@ class LoginPage extends React.Component {
         Setting.showMessage("error", `Unknown authentication type: ${this.state.type}`);
       }
     }
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    this.setState({
+      bindType: params.get("bindType") ?? "",
+    });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -635,7 +642,7 @@ class LoginPage extends React.Component {
       )
       ;
     } else if (signinItem.name === "Username") {
-      if (this.state.loginMethod === "webAuthn") {
+      if (this.state.loginMethod === "webAuthn" || this.state.bindType === "github") {
         return null;
       }
       return (
@@ -744,6 +751,10 @@ class LoginPage extends React.Component {
     } else if (signinItem.name === "Agreement") {
       return AgreementModal.isAgreementRequired(application) ? AgreementModal.renderAgreementFormItem(application, true, {}, this) : null;
     } else if (signinItem.name === "Login button") {
+      if (this.state.bindType === "github") {
+        return null;
+      }
+
       return (
         <Form.Item key={resultItemKey} className="login-button-box" style={{marginBottom: "0"}}>
           <div dangerouslySetInnerHTML={{__html: ("<style>" + signinItem.customCss?.replaceAll("<style>", "").replaceAll("</style>", "") + "</style>")}} />
@@ -754,9 +765,10 @@ class LoginPage extends React.Component {
             className="login-button"
           >
             {
-              this.state.loginMethod === "webAuthn" ? i18next.t("login:Sign in with WebAuthn") :
-                this.state.loginMethod === "faceId" ? i18next.t("login:Sign in with Face ID") :
-                  signinItem.label ? signinItem.label : i18next.t("login:Sign In")
+              this.state.bindType === "sms" ? i18next.t("login:bind with Phone") :
+                this.state.loginMethod === "webAuthn" ? i18next.t("login:Sign in with WebAuthn") :
+                  this.state.loginMethod === "faceId" ? i18next.t("login:Sign in with Face ID") :
+                    signinItem.label ? signinItem.label : i18next.t("login:Sign In")
             }
           </Button>
           {
@@ -790,6 +802,9 @@ class LoginPage extends React.Component {
         </Form.Item>
       );
     } else if (signinItem.name === "Providers") {
+      if (this.state.bindType === "sms") {
+        return null;
+      }
       const showForm = Setting.isPasswordEnabled(application) || Setting.isCodeSigninEnabled(application) || Setting.isWebAuthnEnabled(application) || Setting.isLdapEnabled(application);
       if (signinItem.rule === "None" || signinItem.rule === "") {
         signinItem.rule = showForm ? "small" : "big";
@@ -809,7 +824,11 @@ class LoginPage extends React.Component {
                 }
                 return (
                   <>
-                    <Divider style={{fontSize: "14px", margin: "32px 0"}}>{i18next.t("login:Other login methods")}</Divider>
+                    {
+                      this.state.bindType !== "github" && (
+                        <Divider style={{fontSize: "14px", margin: "32px 0"}}>{i18next.t("login:Other login methods")}</Divider>
+                      )
+                    }
                     <span key={id} onClick={(e) => {
                       const agreementChecked = this.form.current.getFieldValue("agreement");
 
@@ -819,7 +838,7 @@ class LoginPage extends React.Component {
                       }
                     }}>
                       {
-                        ProviderButton.renderProviderLogo(providerItem.provider, application, null, null, signinItem.rule, this.props.location)
+                        ProviderButton.renderProviderLogo(providerItem.provider, application, null, null, signinItem.rule, this.props.location, this.state.bindType)
                       }
                     </span>
                   </>
@@ -1160,6 +1179,8 @@ class LoginPage extends React.Component {
           </div>
         </Col>
       );
+    } else if (this.state.bindType === "github") {
+      return null;
     } else if (this.state.loginMethod?.includes("verificationCode")) {
       return (
         <Col span={24}>

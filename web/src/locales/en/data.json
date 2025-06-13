@@ -570,8 +570,10 @@
     "Terms of Service": "《Terms of Service》",
     "Privacy Policy": "《Privacy Policy》",
     "Login success": "Login to Zhuge Shenma was successful. Please return to your IDE client to get started.",
-    "Log in with GitHub": "Log in with GitHub",
-    "Log in to Zhuge Shenma": "Log in to Zhuge Shenma"
+    "Log in with type": "Log in with {type}",
+    "Log in to Zhuge Shenma": "Log in to Zhuge Shenma",
+    "bind with type": "Bind with {type}",
+    "bind with Phone": "Bind with phone number"
   },
   "mfa": {
     "Each time you sign in to your Account, you'll need your password and a authentication code": "Each time you sign in to your Account, you'll need your password and a authentication code",
