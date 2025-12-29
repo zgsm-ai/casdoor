@@ -94,6 +94,8 @@ type User struct {
 	Ranking           int      `json:"ranking"`
 	Balance           float64  `json:"balance"`
 	Currency          string   `xorm:"varchar(100)" json:"currency"`
+	Vip               int      `xorm:"int default 0" json:"vip"`
+	VipExpire         string   `xorm:"varchar(100)" json:"vip_expire"`
 	IsDefaultAvatar   bool     `json:"isDefaultAvatar"`
 	IsOnline          bool     `json:"isOnline"`
 	IsAdmin           bool     `json:"isAdmin"`

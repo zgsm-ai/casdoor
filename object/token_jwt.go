@@ -36,6 +36,8 @@ type Claims struct {
 	UniversalId   string `json:"universal_id,omitempty"`   // Unified user UUID
 	PhoneNumber   string `json:"phone_number,omitempty"`   // User phone number
 	GithubAccount string `json:"github_account,omitempty"` // User GitHub account
+	Vip           int    `json:"vip,omitempty"`            // User VIP level
+	VipExpire     string `json:"vip_expire,omitempty"`      // User VIP expiration time
 	jwt.RegisteredClaims
 }
 
@@ -421,6 +423,8 @@ func generateJwtToken(application *Application, user *User, provider string, non
 		UniversalId:   user.UniversalId,
 		PhoneNumber:   phoneNumber,
 		GithubAccount: githubAccount,
+		Vip:           user.Vip,
+		VipExpire:     user.VipExpire,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    originBackend,
 			Subject:   user.UniversalId, // Use unified UUID as subject

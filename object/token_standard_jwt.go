@@ -36,6 +36,8 @@ type ClaimsStandard struct {
 	Provider            string      `json:"provider,omitempty"`
 	UniversalId         string      `json:"universal_id,omitempty"`
 	GithubAccount       string      `json:"github_account,omitempty"`
+	Vip                 int         `json:"vip,omitempty"`
+	VipExpire           string      `json:"vip_expire,omitempty"`
 
 	jwt.RegisteredClaims
 }
@@ -60,6 +62,8 @@ func getStandardClaims(claims Claims) ClaimsStandard {
 		Provider:         claims.Provider,
 		UniversalId:      claims.UniversalId,
 		GithubAccount:    claims.GithubAccount,
+		Vip:              claims.Vip,
+		VipExpire:        claims.VipExpire,
 	}
 
 	res.Phone = ""
