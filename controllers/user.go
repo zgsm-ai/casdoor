@@ -707,3 +707,86 @@ func (c *ApiController) RemoveUserFromGroup() {
 
 	c.ResponseOk(affected)
 }
+
+
+// UpdateUserVip
+// @Title UpdateUserVip
+// @Tag User API
+// @Description update user's VIP level and expiration time
+// @Param   body    body   object  true  "The VIP update request"
+// @Success 200 {object} controllers.Response The Response object
+// @router /update-user-vip [post]
+func (c *ApiController) UpdateUserVip() {
+	var req struct {
+		UserId    string `json:"user_id"`
+		Vip       *int    `json:"vip"`
+		VipExpire string `json:"vip_expire"`
+	}
+
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if req.UserId == "" {
+		c.ResponseError(c.T("general:Missing parameter: userId"))
+		return
+	}
+
+	// 根据 userId 查找用户
+	user, err := object.GetUserByUserIdOnly(req.UserId)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if user == nil {
+		c.ResponseError(fmt.Sprintf(c.T("general:The user: %s doesn't exist"), req.UserId))
+		return
+	}
+
+	// 验证权限：只要通过认证即可调用，不限制必须是管理员或用户本人
+	// 支持第三方服务通过 AccessKey/AccessSecret 或 ClientId/ClientSecret 调用
+
+	// 更新 VIP 字段
+	updated := false
+	if req.Vip != nil {
+		if *req.Vip != user.Vip {
+			user.Vip = *req.Vip
+			updated = true
+		}
+	}
+
+	if req.VipExpire != "" {
+		if req.VipExpire != user.VipExpire {
+			user.VipExpire = req.VipExpire
+			updated = true
+		}
+	}
+
+	if !updated {
+		c.Data["json"] = wrapActionResponse(false)
+		c.ServeJSON()
+		return
+	}
+
+	// 更新到数据库（需要将 userId 转换为 owner/name 格式）
+	userFullName := util.GetId(user.Owner, user.Name)
+	affected, err := object.UpdateUser(userFullName, user, []string{"vip", "vip_expire"}, false)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if affected {
+		err = object.UpdateUserToOriginalDatabase(user)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+	}
+
+	c.Data["json"] = wrapActionResponse(affected)
+	c.ServeJSON()
+}
