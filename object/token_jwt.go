@@ -149,6 +149,9 @@ type UserWithoutThirdIdp struct {
 	//SigninWrongTimes    int    `json:"signinWrongTimes"`
 
 	//ManagedAccounts []ManagedAccount `xorm:"managedAccounts blob" json:"managedAccounts"`
+
+	Vip       int    `xorm:"int default 0" json:"vip"`
+	VipExpire string `xorm:"varchar(100)" json:"vip_expire"`
 }
 
 type ClaimsShort struct {
@@ -297,6 +300,10 @@ func getUserWithoutThirdIdp(user *User) *UserWithoutThirdIdp {
 		//SigninWrongTimes:    user.SigninWrongTimes,
 
 		//ManagedAccounts: user.ManagedAccounts,
+
+		// 添加 VIP 字段复制
+		Vip:       user.Vip,
+		VipExpire: user.VipExpire,
 	}
 
 	return res
