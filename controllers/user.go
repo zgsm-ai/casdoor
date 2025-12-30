@@ -718,9 +718,9 @@ func (c *ApiController) RemoveUserFromGroup() {
 // @router /update-user-vip [post]
 func (c *ApiController) UpdateUserVip() {
 	var req struct {
-		UserId    string `json:"user_id"`
-		Vip       *int    `json:"vip"`
-		VipExpire string `json:"vip_expire"`
+		UniversalId    string `json:"user_id"` // casdoor.UniversalId=oidc-auth.user_id
+		Vip            *int    `json:"vip"`
+		VipExpire      string `json:"vip_expire"`
 	}
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
@@ -729,20 +729,20 @@ func (c *ApiController) UpdateUserVip() {
 		return
 	}
 
-	if req.UserId == "" {
-		c.ResponseError(c.T("general:Missing parameter: userId"))
+	if req.UniversalId == "" {
+		c.ResponseError(c.T("general:Missing parameter: user_id"))
 		return
 	}
 
-	// 根据 userId 查找用户
-	user, err := object.GetUserByUserIdOnly(req.UserId)
+	// 根据 universalId 查找用户
+	user, err := object.GetUserByUniversalIdOnly(req.UniversalId)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
 	if user == nil {
-		c.ResponseError(fmt.Sprintf(c.T("general:The user: %s doesn't exist"), req.UserId))
+		c.ResponseError(fmt.Sprintf(c.T("general:The UniversalId: %s doesn't exist"), req.UniversalId))
 		return
 	}
 

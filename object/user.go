@@ -578,6 +578,24 @@ func GetUserByUserIdOnly(userId string) (*User, error) {
 	}
 }
 
+func GetUserByUniversalIdOnly(universalId string) (*User, error) {
+	if universalId == "" {
+		return nil, nil
+	}
+
+	user := User{UniversalId: universalId}
+	existed, err := ormer.Engine.Get(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	if existed {
+		return &user, nil
+	} else {
+		return nil, nil
+	}
+}
+
 func GetUserByInvitationCode(owner string, invitationCode string) (*User, error) {
 	if owner == "" || invitationCode == "" {
 		return nil, nil
