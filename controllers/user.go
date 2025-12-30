@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/beego/beego/utils/pagination"
+	"github.com/casdoor/casdoor/auth"
 	"github.com/casdoor/casdoor/conf"
 	"github.com/casdoor/casdoor/object"
 	"github.com/casdoor/casdoor/util"
@@ -717,13 +718,27 @@ func (c *ApiController) RemoveUserFromGroup() {
 // @Success 200 {object} controllers.Response The Response object
 // @router /update-user-vip [post]
 func (c *ApiController) UpdateUserVip() {
+	// 验证权限：只能通过应用的 ClientId/ClientSecret 认证，个人token无法认证
+	// 使用 auth 包中的认证函数
+	userId, err := auth.GetUsernameByClientIdSecret(c.Ctx)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	
+	// 如果没有提供有效的 ClientId/ClientSecret，则拒绝访问
+	if userId == "" {
+		c.ResponseError(c.T("general:Missing client_id or client_secret"))
+		return
+	}
+	
 	var req struct {
 		UniversalId    string `json:"user_id"` // casdoor.UniversalId=oidc-auth.user_id
 		Vip            *int    `json:"vip"`
 		VipExpire      string `json:"vip_expire"`
 	}
 
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &req)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -745,9 +760,6 @@ func (c *ApiController) UpdateUserVip() {
 		c.ResponseError(fmt.Sprintf(c.T("general:The UniversalId: %s doesn't exist"), req.UniversalId))
 		return
 	}
-
-	// 验证权限：只要通过认证即可调用，不限制必须是管理员或用户本人
-	// 支持第三方服务通过 AccessKey/AccessSecret 或 ClientId/ClientSecret 调用
 
 	// 更新 VIP 字段
 	updated := false
